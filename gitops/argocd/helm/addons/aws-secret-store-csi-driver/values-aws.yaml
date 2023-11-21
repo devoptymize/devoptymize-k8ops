@@ -1,0 +1,69 @@
+# Filename: values-aws.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-05
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+secrets-store-csi-driver:
+  linux:
+    enabled: true
+    image:
+      repository: registry.k8s.io/csi-secrets-store/driver
+      tag: v1.3.3
+      pullPolicy: IfNotPresent
+
+    crds:
+      enabled: true
+      image:
+        repository: registry.k8s.io/csi-secrets-store/driver-crds
+        tag: v1.3.3
+        pullPolicy: IfNotPresent
+
+    registrarImage:
+      repository: registry.k8s.io/sig-storage/csi-node-driver-registrar
+      tag: v2.7.0
+      pullPolicy: IfNotPresent
+
+    livenessProbeImage:
+      repository: registry.k8s.io/sig-storage/livenessprobe
+      tag: v2.9.0
+      pullPolicy: IfNotPresent
+
+    kubeletRootDir: /var/lib/kubelet
+    providersDir: /var/run/secrets-store-csi-providers
+    additionalProvidersDirs:
+      - /etc/kubernetes/secrets-store-csi-providers
+    nodeSelector: {}
+    # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+    # An empty key with operator Exists matches all keys, values and effects which means this will tolerate everything.
+    tolerations:
+      - operator: "Exists"
+    metricsAddr: ":8095"
+    env: []
+    priorityClassName: ""
+    daemonsetAnnotations: {}
+    podAnnotations: {}
+    podLabels: {}
+
+  windows:
+    enabled: false
+    image:
+      repository: registry.k8s.io/csi-secrets-store/driver
+      tag: v1.3.3
+      pullPolicy: IfNotPresent
+
+    registrarImage:
+      repository: registry.k8s.io/sig-storage/csi-node-driver-registrar
+      tag: v2.7.0
+
+    kubeletRootDir: C:\var\lib\kubelet
+    providersDir: C:\\k\\secrets-store-csi-providers
+    additionalProvidersDirs:
+    nodeSelector: {}
+
+  ## Install Default RBAC roles and bindings
+  rbac:
+    install: true
+    pspEnabled: false
+

@@ -1,0 +1,19 @@
+# Filename: Chart.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-11
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+---
+apiVersion: v2
+type: application
+name: sonarqube
+version: 1.0.0
+appVersion: 10.0.0
+dependencies:
+- name: sonarqube
+  repository: https://SonarSource.github.io/helm-chart-sonarqube
+  version: 10.0.0+521

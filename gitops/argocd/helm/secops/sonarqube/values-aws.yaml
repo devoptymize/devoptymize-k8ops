@@ -1,0 +1,92 @@
+sonarqube:
+  deploymentType: "StatefulSet"
+  replicaCount: 1
+
+  OpenShift:
+    enabled: false
+    createSCC: true
+
+  edition: "community"
+
+  image:
+    repository: sonarqube
+    tag: 9.9.0-{{ .Values.edition }}
+    pullPolicy: IfNotPresent
+  securityContext:
+    fsGroup: 1000
+
+  service:
+    type: ClusterIP
+    externalPort: 9000
+    internalPort: 9000
+    labels:
+    annotations: {}
+
+  nginx:
+    enabled: false
+
+  ingress:
+    enabled: false
+    # Used to create an Ingress record.
+    hosts:
+      - name: sonarqube.your-org.com
+        # Different clouds or configurations might need /* as the default path
+        path: /
+        # For additional control over serviceName and servicePort
+        # serviceName: someService
+        # servicePort: somePort
+        # the pathType can be one of the following values: Exact|Prefix|ImplementationSpecific(default)
+        # pathType: ImplementationSpecific
+    annotations:
+    # kubernetes.io/tls-acme: "true"
+    # This property allows for reports up to a certain size to be uploaded to SonarQube
+      nginx.ingress.kubernetes.io/proxy-body-size: "64m"
+
+    # Set the ingressClassName on the ingress record
+    # ingressClassName: nginx
+
+  # Additional labels for Ingress manifest file
+    # labels:
+    #  traffic-type: external
+    #  traffic-type: internal
+    tls: []
+    # Secrets must be manually created in the namespace. To generate a self-signed certificate (and private key) and then create the secret in the cluster please refer to official documentation available at https://kubernetes.github.io/ingress-nginx/user-guide/tls/#tls-secrets
+    # - secretName: chart-example-tls
+    #   hosts:
+    #     - chart-example.local
+
+  caCerts:
+    enabled: false
+    image: adoptopenjdk/openjdk11:alpine
+    secret: your-secret
+
+
+
+  # Set annotations for pods
+  #annotations: {}
+
+  resources:
+    limits:
+      cpu: 800m
+      memory: 4Gi
+    requests:
+      cpu: 400m
+      memory: 2Gi
+
+  persistence:
+    enabled: false
+    ## Set annotations on pvc
+    # annotations: {}
+
+    storageClass:
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    uid: 1000
+
+  # For OpenShift set create=true to ensure service account is created.
+  serviceAccount:
+    create: false
+    # name:
+    # automountToken: false # default
+    ## Annotations for the Service Account
+    annotations: {}

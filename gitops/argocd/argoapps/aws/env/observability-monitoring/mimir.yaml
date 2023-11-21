@@ -1,0 +1,53 @@
+#
+# Filename: mimir-argoapp.yaml
+# Description: ArgoCD application file for mimir
+# Author: CloudifyOps
+# Date: 2023-04-06
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mimir
+  namespace: argocd
+  annotations:
+    # https://argo-cd.readthedocs.io/en/stable/operator-manual/high_availability/#webhook-and-manifest-paths-annotation
+    argocd.argoproj.io/manifest-generate-paths: gitops/argocd/helm/observability-monitoring/mimir
+  labels:
+    app.kubernetes.io/name: mimir-aws
+    app.kubernetes.io/instance: mimir-aws-argocd-app
+    app.kubernetes.io/component: observability-monitoring
+    app.kubernetes.io/part-of: mimir-aws
+spec:
+  destination:
+    namespace: observability-monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: gitops/argocd/helm/observability-monitoring/mimir
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git
+    targetRevision: main
+    helm:
+      valueFiles:
+      - values.yaml
+      - values-aws-dev.yaml
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - Validate=true
+    - SkipDryRunOnMissingResource=false
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=false
+    # retry:
+    #   limit: 5
+    #   backoff:
+    #     duration: 5s
+    #     factor: 2
+    #     maxDuration: 3m0s

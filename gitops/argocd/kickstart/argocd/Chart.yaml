@@ -1,0 +1,16 @@
+# Filename: Chart.yaml
+# Description: Chart.yaml file for deploying the ArgoCD into the EKS cluster.
+# Author: CloudifyOps
+# Date: 2023-04-12
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+---
+apiVersion: v2
+type: application
+name: argo-cd
+version: 1.0.0
+dependencies:
+- name: argo-cd
+  repository: https://argoproj.github.io/argo-helm
+  version: 5.23.5

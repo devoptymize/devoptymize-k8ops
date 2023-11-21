@@ -1,0 +1,22 @@
+#
+# Filename: Chart.yaml
+# Description: Chart description file for loki-distributed
+# Author: CloudifyOps
+# Date: 2023-04-06
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+---
+apiVersion: v2
+name: loki-distributed
+description: Helm chart for Grafana Loki in microservices mode
+type: application
+appVersion: 2.7.4
+version: 0.69.7
+home: https://grafana.github.io/helm-charts
+dependencies:
+- name: loki-distributed
+  repository: https://grafana.github.io/helm-charts
+  version: 0.69.7

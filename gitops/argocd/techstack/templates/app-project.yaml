@@ -1,0 +1,25 @@
+# Filename: app-project.yaml
+# Description: Template file for creating app-project
+# Author: CloudifyOps
+# Date: 2023-04-12
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+{{- if .Values.appproject.created }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ .Values.appproject.name }}
+  namespace: argocd
+spec:
+  description: The {{ .Values.appproject.name }} project
+  sourceRepos:
+  - '*'
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+{{- end -}}

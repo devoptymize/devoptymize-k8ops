@@ -1,0 +1,18 @@
+#
+# Filename: Chart.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-05
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+apiVersion: v2
+type: application
+name: secrets-store-csi-driver-provider-aws
+version: 1.0.0
+dependencies:
+- name: csi-secrets-store-provider-aws
+  repository: https://aws.github.io/eks-charts
+  version: 0.0.4

@@ -1,0 +1,19 @@
+#
+# Filename: Chart.yaml
+# Description: Chart description file for mimir
+# Author: CloudifyOps
+# Date: 2023-04-06
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+apiVersion: v2
+version: 4.2.0
+appVersion: 2.6.0
+description: "Grafana Mimir"
+name: mimir-distributed
+dependencies:
+  - name: mimir-distributed
+    version: 4.2.0
+    repository: https://grafana.github.io/helm-charts

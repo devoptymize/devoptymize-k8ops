@@ -1,0 +1,45 @@
+# Filename: efs_csi_driver.yaml
+# Description: ArgoCD application file for efs_csi_driver
+# Author: CloudifyOps
+# Date: YYYY-MM-DD
+# Version: 1.0
+# License: Copyright (c) [year] CloudifyOps
+# This file is licensed under the CloudifyOps.
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: efs-csi-driver
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: gitops/argocd/helm/addons/aws-efs-csi-driver
+  labels: #change the names accordingly
+    app.kubernetes.io/name: aws-efs-csi-driver
+    app.kubernetes.io/instance: aws-efs-csi-driver-argocd-app
+    app.kubernetes.io/component: aws-efs-csi-driver
+    app.kubernetes.io/part-of: secrets-store-aws-loadbalancer-controller
+    
+spec:
+  destination:
+    server: https://kubernetes.default.svc ## cluster url
+    namespace: kube-system
+  project: default
+  source:
+    path: gitops/argocd/helm/addons/aws-efs-csi-driver
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git
+    targetRevision:  main
+    helm:
+      valueFiles:
+        - values-aws.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - Validate=false
+    - SkipDryRunOnMissingResource=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+ 

@@ -1,0 +1,20 @@
+#
+# Filename: Chart.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-05
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+---
+apiVersion: v2
+type: application
+name: metrics-server
+version: 1.0.0
+appVersion: 3.8.4
+dependencies:
+- name: metrics-server
+  repository: https://kubernetes-sigs.github.io/metrics-server
+  version: 3.8.4

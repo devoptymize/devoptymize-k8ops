@@ -1,0 +1,16 @@
+# Filename: <name_of_the_file>.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: YYYY-MM-DD
+# Version: 1.0
+# License: Copyright (c) [year] CloudifyOps
+# This file is licensed under the CloudifyOps.
+
+apiVersion: v2
+type: application
+name: velero
+version: 1.0.0
+dependencies:
+- name: velero
+  repository: https://vmware-tanzu.github.io/helm-charts
+  version: 3.1.6

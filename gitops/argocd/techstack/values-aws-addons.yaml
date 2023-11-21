@@ -1,0 +1,25 @@
+# Filename: values-aws-addons.yaml
+# Description: Values.yaml file for deploying addons
+# Author: CloudifyOps
+# Date: 2023-04-12
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+---
+appproject:
+  created: true
+  name: devoptymize-k8s-aws-project-addon
+
+techstack:
+  destination:
+    namespace: devoptymize
+    server: https://kubernetes.default.svc
+  name: devoptymize-addon
+  source:
+    path: gitops/argocd/argoapps/aws/env/addons
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git
+    targetRevision: main
+
+# notifications:
+#   slack:
+#     channel: 

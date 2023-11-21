@@ -1,0 +1,39 @@
+istiod:
+   pilot:
+     # Resources for a small pilot install
+     resources:
+       requests:
+         cpu: 500m
+         memory: 128Mi
+   
+   #  keepaliveMaxServerConnectionAge: 30m
+   
+   
+   global:
+     # Used to locate istiod.
+     istioNamespace: istio-system
+   
+     proxy:
+       image: proxyv2
+       # Resources for the sidecar.
+       resources:
+         requests:
+           cpu: 100m
+           memory: 128Mi
+         limits:
+           cpu: 2000m
+           memory: 128Mi
+   
+   base:
+     # For istioctl usage to disable istio config crds in base
+     enableIstioConfigCRDs: true
+   
+     # If enabled, gateway-api types will be validated using the standard upstream validation logic.
+     # This is an alternative to deploying the standalone validation server the project provides.
+     # This is disabled by default, as the cluster may already have a validation server; while technically
+     # it works to have multiple redundant validations, this adds complexity and operational risks.
+     # Users should consider enabling this if they want full gateway-api validation but don't have other validation servers.
+     validateGateway: false
+   
+   
+   

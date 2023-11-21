@@ -1,0 +1,29 @@
+# Filename: <name_of_the_file>.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: YYYY-MM-DD
+# Version: 1.0
+# License: Copyright (c) [year] CloudifyOps
+# This file is licensed under the CloudifyOps.
+
+aws-load-balancer-controller: 
+ replicaCount: 2
+
+ image:
+  repository: public.ecr.aws/eks/aws-load-balancer-controller
+  tag: v2.4.7
+  pullPolicy: IfNotPresent
+
+ imagePullSecrets: []
+ nameOverride: ""
+ fullnameOverride: ""
+
+ serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<Account ID>:role/<Role Name>
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+ clusterName: <Cluster_name>

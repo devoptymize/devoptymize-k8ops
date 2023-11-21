@@ -1,0 +1,53 @@
+#
+# Filename: loki-argoapp.yaml
+# Description: ArgoCD application file for loki
+# Author: CloudifyOps
+# Date: 2023-04-06
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: argocd
+  annotations:
+    # https://argo-cd.readthedocs.io/en/stable/operator-manual/high_availability/#webhook-and-manifest-paths-annotation
+    argocd.argoproj.io/manifest-generate-paths: gitops/argocd/helm/observability-monitoring/loki
+  labels:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki-argocd-app
+    app.kubernetes.io/component: observability-monitoring
+    app.kubernetes.io/part-of: loki
+spec:
+  destination:
+    namespace: observability-monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: gitops/argocd/helm/observability-monitoring/loki
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git
+    targetRevision: main
+    helm:
+      valueFiles:
+      - values.yaml
+      - values-aws-dev.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - Validate=true
+    - SkipDryRunOnMissingResource=false
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=false
+    # retry:
+    #   limit: 5
+    #   backoff:
+    #     duration: 5s
+    #     factor: 2
+    #     maxDuration: 3m0s
