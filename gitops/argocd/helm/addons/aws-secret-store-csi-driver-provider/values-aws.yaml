@@ -1,0 +1,26 @@
+# Filename: values-aws.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-05
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+csi-secrets-store-provider-aws:
+  image:
+    repository: public.ecr.aws/aws-secrets-manager/secrets-store-csi-driver-provider-aws
+    pullPolicy: IfNotPresent
+    tag: 1.0.r2-46-gf2a8f35-2023.03.21.21.55
+
+  nameOverride: ""
+  fullnameOverride: ""
+  providerVolume: "/etc/kubernetes/secrets-store-csi-providers"
+
+  port: 8989
+
+  updateStrategy:
+    type: RollingUpdate
+
+  rbac:
+    install: true
+

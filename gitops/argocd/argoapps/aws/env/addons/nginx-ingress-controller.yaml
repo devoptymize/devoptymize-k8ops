@@ -1,0 +1,50 @@
+# Filename: nginx-ingress-controller.yaml
+# Description: ArgoCD application file for nginx-ingress-controller
+# Author: CloudifyOps
+# Date: 2023-04-10
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-ingress-controller
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: gitops/argocd/helm/addons/nginx-ingress-controller
+  labels: #change the names accordingly
+    app.kubernetes.io/name: nginx-ingress-controller-aws
+    app.kubernetes.io/instance: nginx-ingress-controller-app
+    app.kubernetes.io/component: nginx-ingress-controller
+    app.kubernetes.io/part-of: nginx-ingress-controller-aws
+spec:
+  destination:
+    namespace: nginx-ingress-controller
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: gitops/argocd/helm/addons/nginx-ingress-controller
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git
+    targetRevision: main
+    helm:
+      valueFiles: 
+        - values-aws.yaml 
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - Validate=false
+    - SkipDryRunOnMissingResource=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+    # retry:
+    #   limit: 5
+    #   backoff:
+    #     duration: 5s
+    #     factor: 2
+    #     maxDuration: 3m0s

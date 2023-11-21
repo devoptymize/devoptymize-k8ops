@@ -1,0 +1,23 @@
+#
+# Filename: Chart.yaml
+# Description: Chart description file for Trivy-operator
+# Author: CloudifyOps
+# Date: 2023-04-06
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+---
+apiVersion: v2
+name: trivy-operator
+description: Keeps security report resources updated
+type: application
+
+version: 0.13.0
+appVersion: 0.13.0
+sources:
+  - https://github.com/aquasecurity/trivy-operator
+dependencies:
+  - name: trivy-operator
+    version: 0.13.0
+    repository: https://aquasecurity.github.io/helm-charts/

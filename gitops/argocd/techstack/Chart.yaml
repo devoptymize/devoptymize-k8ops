@@ -1,0 +1,14 @@
+# Filename: Chart.yaml
+# Description: Chart.yaml file for deploying the k8s component as helm chart
+# Author: CloudifyOps
+# Date: 2023-04-12
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+---
+apiVersion: v2
+name: devoptymize-techstack
+description: the techstack for the devoptymize framework
+type: application
+version: 1.0.0
+appVersion: 1.0.0

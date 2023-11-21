@@ -1,0 +1,49 @@
+#
+# Filename: values-aws.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-05
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+# Default values for aws-ebs-csi-driver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+aws-ebs-csi-driver:
+  image:
+    repository: public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
+    # Overrides the image tag whose default is v{{ .Chart.AppVersion }}
+    tag: "v1.17.0"
+    pullPolicy: IfNotPresent
+
+  # -- Custom labels to add into metadata
+  customLabels:
+    {}
+    # k8s-app: aws-ebs-csi-driver
+
+  sidecars:
+    provisioner:
+      env: []
+      image:
+        pullPolicy: IfNotPresent
+        repository: public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+        tag: "v3.4.0-eks-1-26-latest"
+      logLevel: 2
+      resources: {}
+      # Tune leader lease election for csi-provisioner.
+      # Leader election is on by default.
+    attacher:
+      env: []
+      image:
+        pullPolicy: IfNotPresent
+        repository: public.ecr.aws/eks-distro/kubernetes-csi/external-attacher
+        tag: "v4.2.0-eks-1-26-latest"
+ 
+    serviceAccount:
+    # A service account will be created for you if set to true. Set to false if you want to use your own.
+      create: true
+      name: ebs-csi-controller-sa
+      annotations: 
+        eks.amazonaws.com/role-arn: arn:aws:iam::<Account ID>:role/<Role Name>

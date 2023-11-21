@@ -1,0 +1,16 @@
+# Filename: <name_of_the_file>.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: YYYY-MM-DD
+# Version: 1.0
+# License: Copyright (c) [year] CloudifyOps
+# This file is licensed under the CloudifyOps.
+
+apiVersion: v2
+type: application
+name: kyverno
+version: 1.0.0
+dependencies:
+- name: kyverno
+  repository: https://kyverno.github.io/kyverno/
+  version: 2.7.1

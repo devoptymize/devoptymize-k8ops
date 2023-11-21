@@ -1,0 +1,57 @@
+#
+# Filename: sonarqube.yaml
+# Description: ArgoCD application file for sonarqube
+# Author: CloudifyOps
+# Date: 2023-04-11
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sonarqube
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: gitops/argocd/helm/secops/sonarqube
+  labels: #change the names accordingly
+    app.kubernetes.io/name: sonarqube
+    app.kubernetes.io/instance: sonarqube-argocd-app
+    app.kubernetes.io/component: sonarqube
+    app.kubernetes.io/part-of: sonarqube
+spec:
+  destination:
+    namespace: sonarqube
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: gitops/argocd/helm/secops/sonarqube
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git 
+    targetRevision: main
+    helm:
+      valueFiles: 
+        - values-aws.yaml 
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - Validate=false
+    - SkipDryRunOnMissingResource=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+    # retry:
+    #   limit: 5
+    #   backoff:
+    #     duration: 5s
+    #     factor: 2
+    #     maxDuration: 3m0s
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      name: sonarqube-postgresql
+      jsonPointers:
+        - /spec/volumeClaimTemplates  

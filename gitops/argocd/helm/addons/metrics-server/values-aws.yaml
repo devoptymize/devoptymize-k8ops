@@ -1,0 +1,34 @@
+#
+# Filename: values-aws.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-05
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+
+# Default values for metrics-server.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+metrics-server:
+  # image:
+  #   repository: registry.k8s.io/metrics-server/metrics-server
+  #   # Overrides the image tag whose default is v{{ .Chart.AppVersion }}
+  #   tag: ""
+  #   pullPolicy: IfNotPresent
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+    # The list of secrets mountable by this service account.
+    # See https://kubernetes.io/docs/reference/labels-annotations-taints/#enforce-mountable-secrets
+    secrets: []
+
+  rbac:
+    # Specifies whether RBAC resources should be created
+    create: true
+    pspEnabled: false

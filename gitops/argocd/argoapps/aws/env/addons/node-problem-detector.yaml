@@ -1,0 +1,51 @@
+#
+# Filename: node-problem-detector.yaml
+# Description: ArgoCD application file for node-problem-detector
+# Author: CloudifyOps
+# Date: 2023-04-10
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: node-problem-detector
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: gitops/argocd/helm/addons/node-problem-detector
+  labels: #change the names accordingly
+    app.kubernetes.io/name: node-problem-detector-aws
+    app.kubernetes.io/instance: node-problem-detector-argocd-app
+    app.kubernetes.io/component: node-problem-detector
+    app.kubernetes.io/part-of: node-problem-detector-aws
+spec:
+  destination:
+    namespace: kube-system
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: gitops/argocd/helm/addons/node-problem-detector
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git 
+    targetRevision: main
+    helm:
+      valueFiles: 
+        - values-aws.yaml 
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - Validate=false
+    - SkipDryRunOnMissingResource=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+    # retry:
+    #   limit: 5
+    #   backoff:
+    #     duration: 5s
+    #     factor: 2
+    #     maxDuration: 3m0s

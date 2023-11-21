@@ -1,0 +1,52 @@
+#
+# Filename: metric-server.yaml
+# Description: ArgoCD application file for metric-server
+# Author: CloudifyOps
+# Date: 2023-04-06
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metric-server
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: gitops/argocd/helm/addons/metrics-server
+  labels: #change the names accordingly
+    app.kubernetes.io/name: metric-server-aws
+    app.kubernetes.io/instance: metric-server-aws-argocd-app
+    app.kubernetes.io/component: metric-server
+    app.kubernetes.io/part-of: metric-server-aws
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  project: default
+  source:
+    path: gitops/argocd/helm/addons/metrics-server
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git
+    targetRevision: main
+    helm:
+      valueFiles: 
+        - values-aws.yaml 
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - Validate=false
+    - SkipDryRunOnMissingResource=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+    # retry:
+    #   limit: 5
+    #   backoff:
+    #     duration: 5s
+    #     factor: 2
+    #     maxDuration: 3m0s

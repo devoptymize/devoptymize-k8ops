@@ -1,0 +1,47 @@
+# Filename: Chart.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-10
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+# This file is licensed under the CloudifyOps.
+
+velero:
+  configuration:
+    backupStorageLocation:
+      name: cluster-backup
+      bucket: <bucket_name>
+    provider: aws
+    volumeSnapshotLocation:
+      config:
+        region: us-east-1
+  credentials:
+    useSecret: false
+  initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.2.0
+    volumeMounts:
+    - mountPath: /target
+      name: plugins
+  serviceAccount:
+    server:
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::<Account ID>:role/<Role Name> ## Updated the annotation by adding the Account id and Role name
+
+  schedules:
+    mybackup:
+      disabled: false
+      labels:
+        myenv: foo
+      annotations:
+        myenv: foo
+      schedule: "* * * * *"
+      template:
+        includeClusterResources: true
+        includedNamespaces:
+        - '*'
+        includedResources:
+        - '*'
+        storageLocation: cluster-backup
+        snapshotVolumes: false      
+        ttl: "240h"

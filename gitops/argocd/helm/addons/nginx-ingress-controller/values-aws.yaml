@@ -1,0 +1,68 @@
+#
+# Filename: values-aws.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-10
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+
+# Default values for metrics-server.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nginx-ingress-controller:
+  controller:
+    name: controller
+    image:
+      ## Keep false as default for now!
+      chroot: false
+      registry: registry.k8s.io
+      image: ingress-nginx/controller
+      tag: "v1.7.0"
+      digest: sha256:7612338342a1e7b8090bef78f2a04fffcadd548ccaabe8a47bf7758ff549a5f7
+      digestChroot: sha256:e84ef3b44c8efeefd8b0aa08770a886bfea1f04c53b61b4ba9a7204e9f1a7edc
+      pullPolicy: IfNotPresent
+      runAsUser: 101
+      allowPrivilegeEscalation: true
+    existingPsp: ""
+    # -- Configures the controller container name
+    containerName: controller
+    # -- Configures the ports that the nginx-controller listens on
+    containerPort:
+      http: 80
+      https: 443
+    ingressClassResource:
+      # -- Name of the ingressClass
+      name: nginx
+      # -- Is this ingressClass enabled or not
+      enabled: true
+      # -- Is this the default ingressClass for the cluster
+      default: false
+      # -- Controller-value of the controller that is processing this ingressClass
+      controllerValue: "k8s.io/ingress-nginx"
+    service:
+      annotations: {}
+      externalIPs: []
+      # loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+      servicePort: 80
+      type: ClusterIP
+    priorityClassName: ""
+    # -- Labels to be added to the default backend resources
+    labels: {}
+
+  rbac:
+    create: true
+    scope: false
+  podSecurityPolicy:
+    enabled: false
+  serviceAccount:
+    create: true
+    name: "nginx-ingress-controller-sa"
+    automountServiceAccountToken: true
+    # -- Annotations for the controller service account
+    annotations: 
+      eks.amazonaws.com/role-arn: arn:aws:iam::<Account ID>:role/<Role Name>
+  imagePullSecrets: []
+  # - name: secretName

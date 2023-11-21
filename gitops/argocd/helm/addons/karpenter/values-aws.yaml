@@ -1,0 +1,110 @@
+# Filename: <name_of_the_file>.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: YYYY-MM-DD
+# Version: 1.0
+# License: Copyright (c) [year] CloudifyOps
+# This file is licensed under the CloudifyOps.
+
+karpenter: 
+
+  nameOverride: ""
+  fullnameOverride: ""
+  additionalLabels: {}
+
+  additionalAnnotations: {}
+  imagePullPolicy: IfNotPresent
+  serviceAccount:
+    create: true
+    name: ""
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::<Account ID>:role/<Role Name>
+  serviceMonitor:
+    enabled: false
+  replicas: 2
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  podDisruptionBudget:
+    name: karpenter
+    maxUnavailable: 1
+  podSecurityContext:
+    fsGroup: 1000
+  priorityClassName: system-cluster-critical
+  terminationGracePeriodSeconds:
+  dnsPolicy: Default
+  nodeSelector:
+    kubernetes.io/os: linux
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: karpenter.sh/provisioner-name
+                operator: DoesNotExist
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - topologyKey: "kubernetes.io/hostname"
+
+  extraObjects: []
+    # - apiVersion: karpenter.k8s.aws/v1alpha1
+    #   kind: AWSNodeTemplate
+    #   metadata:
+    #     name: default
+    #     annotations:
+    #       "helm.sh/hook": "post-install,post-upgrade"
+    #       "helm.sh/hook-delete-policy": before-hook-creation
+    #   spec:
+    #     subnetSelector:
+    #       karpenter.sh/discovery: "<Cluster_name>"
+    #     securityGroupSelector:
+    #       karpenter.sh/discovery: "<Cluster_name>"
+
+    # - apiVersion: karpenter.sh/v1alpha5
+    #   kind: Provisioner
+    #   metadata:
+    #     name: default
+    #     annotations:
+    #       "helm.sh/hook": "post-install,post-upgrade"
+    #       "helm.sh/hook-delete-policy": before-hook-creation
+    #   spec:
+    #     requirements:
+    #       - key: node.kubernetes.io/instance-type
+    #         operator: In
+    #         values: [t3a.medium, t3a.large]
+    #     providerRef:
+    #       name: default
+
+  controller:
+    image:
+      repository: public.ecr.aws/karpenter/controller
+      tag: v0.27.1
+      digest: sha256:aa4c1b1dca9d928e4a04f63680ae14cc912bc1b02146e0d3d36c8cd873bbc1e9
+    outputPaths:
+      - stdout
+    errorOutputPaths:
+      - stderr
+    metrics:
+      port: 8080
+    healthProbe:
+      port: 8081
+  webhook:
+    logLevel: error
+    port: 8443
+  logLevel: debug
+  logEncoding: console
+  settings:
+    batchMaxDuration: 10s
+    batchIdleDuration: 1s
+    aws:
+      clusterName: "devoptymize-cluster"
+      defaultInstanceProfile: "test-profile"
+      enablePodENI: false
+      enableENILimitedPodDensity: true
+      isolatedVPC: false
+      nodeNameConvention: "ip-name"
+      vmMemoryOverheadPercent: 0.075
+    featureGates:
+      driftEnabled: false

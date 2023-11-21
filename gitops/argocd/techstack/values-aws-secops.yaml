@@ -1,0 +1,21 @@
+# Filename: values-aws-secops.yaml
+# Description: values.yaml file for deploying secops component.
+# Author: CloudifyOps
+# Date: 2023-04-12
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+---
+appproject:
+  created: true
+  name: devoptymize-k8s-aws-project-secops
+
+techstack:
+  destination:
+    namespace: devoptymize
+    server: https://kubernetes.default.svc
+  name: devoptymize-secops
+  source:
+    path: gitops/argocd/argoapps/aws/env/secops
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git
+    targetRevision: main

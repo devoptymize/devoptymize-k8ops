@@ -1,0 +1,490 @@
+# Filename: values-aws.yaml
+# Description: This is the customized values.yaml for deploying argocd into an EKS cluster with AWS loadbalancer contoller as an ingress controller.
+# Author: CloudifyOps
+# Date: 2023-04-12
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+
+argo-cd:
+  global:
+    image:
+      # -- If defined, a repository applied to all Argo CD deployments
+      repository: quay.io/argoproj/argocd
+      # -- Overrides the global Argo CD image tag whose default is the chart appVersion
+      tag: ""
+  server:
+    ingress:
+      # -- Enable an ingress resource for the Argo CD server
+      enabled: true
+      # -- Additional ingress annotations
+      annotations:
+        alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
+        { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+        alb.ingress.kubernetes.io/certificate-arn: <acm-certificate-arn>
+        alb.ingress.kubernetes.io/group.name: <ingress-group-name>
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+        alb.ingress.kubernetes.io/load-balancer-name: <alb-name>
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/subnets: <subnet-id>
+        alb.ingress.kubernetes.io/target-type: ip
+        kubernetes.io/ingress.class: alb
+        alb.ingress.kubernetes.io/success-codes: '200'
+      #alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+      # -- Additional ingress labels
+      labels: {}
+      # -- Defines which ingress controller will implement the resource
+      #ingressClassName: "alb"
+  
+      # -- List of ingress hosts
+      ## Argo Ingress.
+      ## Hostnames must be provided if Ingress is enabled.
+      ## Secrets must be manually created in the namespace
+      hosts:
+        - <host-name>
+  
+      # -- List of ingress paths
+      paths:
+        - /
+      # -- Ingress path type. One of `Exact`, `Prefix` or `ImplementationSpecific`
+      pathType: Prefix
+      serviceName: argocd-server
+      servicePort: 80
+  configs:
+    credentialTemplates:
+      https-creds:
+        url: ""
+        password: ""
+        username: ""
+    params:
+      ## Server properties
+      # -- Run server without TLS
+      server.insecure: true
+  notifications:
+    # -- Enable notifications controller
+    enabled: true
+  
+    # -- Notifications controller name string
+    name: notifications-controller
+  
+    # -- Argo CD dashboard url; used in place of {{.context.argocdUrl}} in templates
+    argocdUrl: <argocd-url>
+  
+    ## Notifications controller Pod Disruption Budget
+    ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+    pdb:
+      # -- Deploy a [PodDisruptionBudget] for the notifications controller
+      enabled: false
+      # -- Labels to be added to notifications controller pdb
+      labels: {}
+      # -- Annotations to be added to notifications controller pdb
+      annotations: {}
+      # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
+      # @default -- `""` (defaults to 0 if not specified)
+      minAvailable: ""
+      # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
+      ## Has higher precedence over `notifications.pdb.minAvailable`
+      maxUnavailable: ""
+    ## Notifications controller image
+    image:
+      # -- Repository to use for the notifications controller
+      # @default -- `""` (defaults to global.image.repository)
+      repository: ""
+      # -- Tag to use for the notifications controller
+      # @default -- `""` (defaults to global.image.tag)
+      tag: ""
+      # -- Image pull policy for the notifications controller
+      # @default -- `""` (defaults to global.image.imagePullPolicy)
+      imagePullPolicy: ""
+  
+    secret:
+      # -- Whether helm chart creates notifications controller secret
+      items:
+        email-username: ""
+        email-password: ""
+        slack-token: ""
+      create: true
+      # -- key:value pairs of annotations to be added to the secret
+      annotations: {}
+    notifiers:
+      service.email.gmail: |
+        username: $email-username
+        password: $email-password
+        host: smtp.gmail.com
+        port: 465
+        from: $email-username
+      service.slack: |
+        token: $slack-token
+    # -- Annotations to be applied to the notifications controller Deployment
+    deploymentAnnotations: {}
+    # -- Annotations to be applied to the notifications controller Pods
+    podAnnotations: {}
+    # -- Labels to be applied to the notifications controller Pods
+    podLabels: {}
+    # -- Resource limits and requests for the notifications controller
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+    # Notification controller container ports
+    containerPorts:
+      # -- Metrics container port
+      metrics: 9001
+    # -- [DNS configuration]
+    dnsConfig: {}
+    # -- Alternative DNS policy for notifications controller Pods
+    dnsPolicy: "ClusterFirst"
+    # -- Notification controller container-level security Context
+    # @default -- See [values.yaml]
+    containerSecurityContext:
+      runAsNonRoot: true
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      seccompProfile:
+        type: RuntimeDefault
+      capabilities:
+        drop:
+        - ALL
+    # -- [Node selector]
+    nodeSelector: {}
+    # -- [Tolerations] for use with node taints
+    tolerations: []
+    # -- Assign custom [affinity] rules
+    # @default -- `{}` (defaults to global.affinity preset)
+    affinity: {}
+    # -- Priority class for the notifications controller pods
+    priorityClassName: ""
+    serviceAccount:
+      # -- Create notifications controller service account
+      create: true
+      # -- Notification controller service account name
+      name: argocd-notifications-controller
+      # -- Annotations applied to created service account
+      annotations: {}
+      # -- Labels applied to created service account
+      labels: {}
+      # -- Automount API credentials for the Service Account
+      automountServiceAccountToken: true
+    cm:
+      # -- Whether helm chart creates notifications controller config map
+      create: true
+    # -- Contains centrally managed global application subscriptions
+    ## For more information: https://argocd-notifications.readthedocs.io/en/stable/subscriptions/
+    subscriptions:
+      # # subscription for on-sync-status-unknown trigger notifications
+      - recipients:
+        - slack:""
+        - email:""
+        triggers:
+        - on-sync-succeeded
+      # # subscription restricted to applications with matching labels only
+      - recipients:
+        # - slack:test3
+        selector: test=true
+        triggers:
+        - on-sync-status-unknown
+    # -- The notification template is used to generate the notification content
+    ## For more information: https://argocd-notifications.readthedocs.io/en/stable/templates/
+    templates:
+      template.app-deployed: |
+        email:
+          subject: New version of an application {{.app.metadata.name}} is up and running.
+        message: |
+          {{if eq .serviceType "slack"}}:white_check_mark:{{end}} Application {{.app.metadata.name}} is now running new version of deployments manifests.
+        slack:
+          attachments: |
+            [{
+              "title": "{{ .app.metadata.name}}",
+              "title_link":"{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#18be52",
+              "fields": [
+              {
+                "title": "Sync Status",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              },
+              {
+                "title": "Repository",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              },
+              {
+                "title": "Revision",
+                "value": "{{.app.status.sync.revision}}",
+                "short": true
+              }
+              {{range $index, $c := .app.status.conditions}}
+              {{if not $index}},{{end}}
+              {{if $index}},{{end}}
+              {
+                "title": "{{$c.type}}",
+                "value": "{{$c.message}}",
+                "short": true
+              }
+              {{end}}
+              ]
+            }]
+      template.app-health-degraded: |
+        email:
+          subject: Application {{.app.metadata.name}} has degraded.
+        message: |
+          {{if eq .serviceType "slack"}}:exclamation:{{end}} Application {{.app.metadata.name}} has degraded.
+          Application details: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}.
+        slack:
+          attachments: |-
+            [{
+              "title": "{{ .app.metadata.name}}",
+              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#f4c030",
+              "fields": [
+              {
+                "title": "Sync Status",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              },
+              {
+                "title": "Repository",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              }
+              {{range $index, $c := .app.status.conditions}}
+              {{if not $index}},{{end}}
+              {{if $index}},{{end}}
+              {
+                "title": "{{$c.type}}",
+                "value": "{{$c.message}}",
+                "short": true
+              }
+              {{end}}
+              ]
+            }]
+      template.app-sync-failed: |
+        email:
+          subject: Failed to sync application {{.app.metadata.name}}.
+        message: |
+          {{if eq .serviceType "slack"}}:exclamation:{{end}}  The sync operation of application {{.app.metadata.name}} has failed at {{.app.status.operationState.finishedAt}} with the following error: {{.app.status.operationState.message}}
+          Sync operation details are available at: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true .
+  
+          Repository: {{.app.spec.source.repoURL}}
+  
+          Revision: {{.app.status.sync.revision}}
+  
+          Application: {{.app.metadata.name}}
+  
+          Sync Status: {{.app.status.sync.status}}
+  
+          Branch: {{.app.spec.source.targetRevision}}
+  
+          Path: {{.app.spec.source.path}}
+  
+          ProjectName: {{.app.spec.project}}
+  
+          AppNamespace: {{.app.spec.destination.namespace}}
+  
+          Sync message: {{.app.status.operationState.message}}
+  
+          Sync start: {{.app.status.operationState.startedAt}}
+  
+          Sync finish: {{.app.status.operationState.finishedAt}}
+  
+        slack:
+          attachments: |-
+            [{
+              "title": "{{ .app.metadata.name}}",
+              "title_link":"{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#E96D76",
+              "fields": [
+              {
+                "title": "Sync Status",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              },
+              {
+                "title": "Repository",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              }
+              {{range $index, $c := .app.status.conditions}}
+              {{if not $index}},{{end}}
+              {{if $index}},{{end}}
+              {
+                "title": "{{$c.type}}",
+                "value": "{{$c.message}}",
+                "short": true
+              }
+              {{end}}
+              ]
+            }]
+      template.app-sync-running: |
+        email:
+          subject: Start syncing application {{.app.metadata.name}}.
+        message: |
+          The sync operation of application {{.app.metadata.name}} has started at {{.app.status.operationState.startedAt}}.
+          Sync operation details are available at: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true .
+        slack:
+          attachments: |-
+            [{
+              "title": "{{ .app.metadata.name}}",
+              "title_link":"{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#0DADEA",
+              "fields": [
+              {
+                "title": "Sync Status",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              },
+              {
+                "title": "Repository",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              }
+              {{range $index, $c := .app.status.conditions}}
+              {{if not $index}},{{end}}
+              {{if $index}},{{end}}
+              {
+                "title": "{{$c.type}}",
+                "value": "{{$c.message}}",
+                "short": true
+              }
+              {{end}}
+              ]
+            }]
+      template.app-sync-status-unknown: |
+        email:
+          subject: Application {{.app.metadata.name}} sync status is 'Unknown'
+        message: |
+          {{if eq .serviceType "slack"}}:exclamation:{{end}} Application {{.app.metadata.name}} sync is 'Unknown'.
+          Application details: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}.
+          {{if ne .serviceType "slack"}}
+          {{range $c := .app.status.conditions}}
+              * {{$c.message}}
+          {{end}}
+          {{end}}
+        slack:
+          attachments: |-
+            [{
+              "title": "{{ .app.metadata.name}}",
+              "title_link":"{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#E96D76",
+              "fields": [
+              {
+                "title": "Sync Status",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              },
+              {
+                "title": "Repository",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              }
+              {{range $index, $c := .app.status.conditions}}
+              {{if not $index}},{{end}}
+              {{if $index}},{{end}}
+              {
+                "title": "{{$c.type}}",
+                "value": "{{$c.message}}",
+                "short": true
+              }
+              {{end}}
+              ]
+            }]
+      template.app-sync-succeeded: |
+        email:
+          subject: Application {{.app.metadata.name}} has been successfully synced.
+        message: |
+          {{if eq .serviceType "slack"}}:white_check_mark:{{end}} Application {{.app.metadata.name}} has been successfully synced at {{.app.status.operationState.finishedAt}}.
+          Sync operation details are available at: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true .
+  
+          Repository: {{.app.spec.source.repoURL}}
+  
+          Revision: {{.app.status.sync.revision}}
+  
+          Application: {{.app.metadata.name}}
+  
+          Sync Status: {{.app.status.sync.status}}
+  
+          Branch: {{.app.spec.source.targetRevision}}
+  
+          Path: {{.app.spec.source.path}}
+  
+          ProjectName: {{.app.spec.project}}
+  
+          AppNamespace: {{.app.spec.destination.namespace}}
+  
+          Sync message: {{.app.status.operationState.message}}
+  
+          Sync start: {{.app.status.operationState.startedAt}}
+  
+          Sync finish: {{.app.status.operationState.finishedAt}}
+  
+  
+        slack:
+          attachments: |-
+            [{
+              "title": "{{ .app.metadata.name}}",
+              "title_link":"{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#18be52",
+              "fields": [
+              {
+                "title": "Sync Status",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              },
+              {
+                "title": "Repository",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              },
+              {
+                "title": "Revision",
+                "value": "{{.app.status.sync.revision}}",
+                "short": true
+              }
+              {{range $index, $c := .app.status.conditions}}
+              {{if not $index}},{{end}}
+              {{if $index}},{{end}}
+              {
+                "title": "{{$c.type}}",
+                "value": "{{$c.message}}",
+                "short": true
+              }
+              {{end}}
+              ]
+            }]
+    # -- The trigger defines the condition when the notification should be sent
+    ## For more information: https://argocd-notifications.readthedocs.io/en/stable/triggers/
+    triggers:
+      trigger.on-deployed: |
+        - description: Application is synced and healthy. Triggered once per commit.
+          oncePer: app.status.sync.revision
+          send:
+          - app-deployed
+          when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+      trigger.on-health-degraded: |
+        - description: Application has degraded
+          send:
+          - app-health-degraded
+          when: app.status.health.status == 'Degraded'
+      trigger.on-sync-failed: |
+        - description: Application syncing has failed
+          send:
+          - app-sync-failed
+          when: app.status.operationState.phase in ['Error', 'Failed']
+      trigger.on-sync-running: |
+        - description: Application is being synced
+          send:
+          - app-sync-running
+          when: app.status.operationState.phase in ['Running']
+      trigger.on-sync-status-unknown: |
+        - description: Application status is 'Unknown'
+          send:
+          - app-sync-status-unknown
+          when: app.status.sync.status == 'Unknown'
+      trigger.on-sync-succeeded: |
+        - description: Application syncing has succeeded
+          send:
+          - app-sync-succeeded
+          when: app.status.operationState.phase in ['Succeeded']

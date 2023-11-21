@@ -1,0 +1,25 @@
+# Filename: values-aws-observability-monitoring.yaml
+# Description: values file for observability-monitoring deployment.
+# Author: CloudifyOps
+# Date: 2023-04-12
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+---
+appproject:
+  created: true
+  name: devoptymize-k8s-aws-project-observability-monitoring
+
+techstack:
+  destination:
+    namespace: devoptymize
+    server: https://kubernetes.default.svc
+  name: devoptymize-observability-monitoring
+  source:
+    path: gitops/argocd/argoapps/aws/env/observability-monitoring
+    repoURL: https://github.com/devoptymize/devoptymize-k8ops.git
+    targetRevision: main
+
+# notifications:
+#   slack:
+#     channel: 

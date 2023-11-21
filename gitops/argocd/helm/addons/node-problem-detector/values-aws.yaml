@@ -1,0 +1,40 @@
+#
+# Filename: values-aws.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: 2023-04-10
+# Version: 1.0
+# License: Copyright (c) [2023] CloudifyOps
+#          This file is licensed under the CloudifyOps.
+#
+
+node-problem-detector:
+  image:
+    repository: registry.k8s.io/node-problem-detector/node-problem-detector
+    tag: v0.8.12
+    # image.digest -- the image digest. If given it takes precedence over a given tag.
+    digest: ""
+    pullPolicy: IfNotPresent
+
+  serviceAccount:
+    # Specifies whether a ServiceAccount should be created
+    create: true
+    # The name of the ServiceAccount to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name:
+
+  metrics:
+    # metrics.enabled -- Expose metrics in Prometheus format with default configuration.
+    enabled: true
+    # metrics.annotations -- Override all default annotations when `metrics.enabled=true` with specified values.
+    annotations: {}
+    serviceMonitor:
+      enabled: false
+      additionalLabels: {}
+    prometheusRule:
+      enabled: false
+      defaultRules:
+        create: true
+        disabled: []
+      additionalLabels: {}
+      additionalRules: []

@@ -1,0 +1,22 @@
+# Filename: <name_of_the_file>.yaml
+# Description: A brief description of what this file contains
+# Author: CloudifyOps
+# Date: YYYY-MM-DD
+# Version: 1.0
+# License: Copyright (c) [year] CloudifyOps
+# This file is licensed under the CloudifyOps.
+
+aws-efs-csi-driver:
+  image:
+    repository: amazon/aws-efs-csi-driver
+    tag: "v1.5.4"
+    pullPolicy: IfNotPresent
+
+
+  controller:
+    # Specifies whether a service account should be created
+    serviceAccount:
+      create: true
+      name: efs-csi-controller-sa
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::<Account ID>:role/<Role Name>
