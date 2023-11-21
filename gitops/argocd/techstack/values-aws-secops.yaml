@@ -19,7 +19,3 @@ techstack:
     path: gitops/argocd/argoapps/aws/env/secops
     repoURL: https://github.com/devoptymize/devoptymize-k8ops.git
     targetRevision: main
-
-# notifications:
-#   slack:
-#     channel: dframe-k8s

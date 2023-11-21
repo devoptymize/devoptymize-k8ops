@@ -146,7 +146,7 @@ loki-distributed:
       aws:
         # updated the s3 bucket and region
         s3: s3://us-east-1
-        bucketnames: dframe-loki-distributed
+        bucketnames: <bucket_name>
 
   serviceAccount:
     # -- Specifies whether a ServiceAccount should be created
@@ -157,7 +157,7 @@ loki-distributed:
     # -- Annotations for the service account
     annotations: 
       # the role to be updated and the SA name should be update in the trust relationship policy
-      eks.amazonaws.com/role-arn: arn:aws:iam::***********:role/loki-distributed-bucket-role
+      eks.amazonaws.com/role-arn: arn:aws:iam::<Account ID>:role/<Role Name>
 
 
   # Configuration for the ingester

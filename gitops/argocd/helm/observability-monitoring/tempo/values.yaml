@@ -34,7 +34,7 @@ tempo-distributed:
     trace:
       backend: s3
       s3:
-        bucket: 'dframe-loki-distributed'
+        bucket: <bucekt_name>
         region: 'us-east-1'
         endpoint: 's3.us-east-1.amazonaws.com'
         insecure: true
@@ -70,7 +70,7 @@ tempo-distributed:
     imagePullSecrets: []
     # -- Annotations for the service account
     annotations: 
-          eks.amazonaws.com/role-arn: arn:aws:iam::***********:role/loki-distributed-bucket-role
+          eks.amazonaws.com/role-arn: arn:aws:iam::<Account ID>:role/<Role Name>
 
   # Configuration for the metrics-generator
   metricsGenerator:

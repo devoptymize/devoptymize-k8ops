@@ -16,7 +16,7 @@ mimir-distributed:
     # Attaching AWS IAM Role to serviceAccount
     name: mimir
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::***********:role/******-test-mimir-distributed-bucket-role
+      eks.amazonaws.com/role-arn: arn:aws:iam::<Account ID>:role/<Role Name>
 
   mimir:
     structuredConfig:
@@ -26,7 +26,7 @@ mimir-distributed:
         s3:
           region: us-east-1
           endpoint: s3.us-east-1.amazonaws.com
-          bucket_name: ******-test-dframe-mimir-distributed-bucket
+          bucket_name: <bucekt_name>
   alertmanager:
     persistentVolume:
       enabled: true
